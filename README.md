@@ -74,7 +74,7 @@ This project demonstrates **full-stack development**, **API integration**, and *
 ```
 Weather-X/
 │
-├── client/                # Frontend (React)
+├── front-end/                # Frontend (React)
 │   ├── src/
 │   │   ├── components/
 │   │   ├── pages/
@@ -82,7 +82,7 @@ Weather-X/
 │   │   ├── hooks/
 │   │   └── App.jsx
 │
-├── server/                # Backend (Node.js)
+├── back-end/                # Backend (Node.js)
 │   ├── controllers/
 │   ├── routes/
 │   ├── models/
@@ -111,14 +111,14 @@ cd Weather-X
 ### 2️⃣ Setup Backend
 
 ```bash
-cd server
+cd back-end
 npm install
 ```
 
 Create a `.env` file inside `/server`:
 
 ```
-PORT=5000
+PORT=8000
 API_KEY=your_openweather_api_key
 MONGO_URI=your_mongodb_connection_string
 ```
@@ -134,53 +134,9 @@ npm start
 ### 3️⃣ Setup Frontend
 
 ```bash
-cd client
+cd front-end
 npm install
-npm run dev
-```
-
----
-
-## 🔗 API Endpoints
-
-### Weather
-
-* `GET /api/weather/current?city=Kolkata`
-* `GET /api/weather/location?lat=XX&lon=YY`
-
-### Search History
-
-* `GET /api/history`
-* `POST /api/history`
-
----
-
-## 🌐 Deployment
-
-### Frontend
-
-* Deployed on Vercel  
-
-### Backend
-
-* Deployed on Render  
-
----
-
-## 🔐 Environment Variables
-
-### Backend (.env)
-
-```
-PORT=5000
-API_KEY=your_api_key
-MONGO_URI=your_database_url
-```
-
-### Frontend (.env)
-
-```
-VITE_API_URL=https://your-backend-url.onrender.com
+npm start
 ```
 
 ---
