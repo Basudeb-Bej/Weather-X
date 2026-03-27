@@ -1,0 +1,14 @@
+{
+  "name": "weather-app-root",
+  "private": true,
+  "scripts": {
+    "start": "npm run dev --prefix front-end",
+    "dev": "npm run dev --prefix front-end",
+    "build": "npm run build --prefix front-end",
+    "lint": "npm run lint --prefix front-end"
+  },
+  "dependencies": {
+    "express-rate-limit": "^8.3.1",
+    "express-validator": "^7.3.1"
+  }
+}
