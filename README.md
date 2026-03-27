@@ -174,18 +174,6 @@ Steps:
 
 ---
 
-## 📸 Screenshots
-
-> Add screenshots here to improve project visibility
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License.
-
----
-
 ## 👨‍💻 Author
 
 **Basudeb Bej**  
