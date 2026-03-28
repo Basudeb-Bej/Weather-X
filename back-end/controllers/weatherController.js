@@ -6,6 +6,7 @@ const { isDatabaseConnected } = require("../config/db");
 
 async function saveSearch(city) {
   if (!isDatabaseConnected()) {
+    console.warn(`Search history save skipped for "${city}": MongoDB is not connected.`);
     return;
   }
 

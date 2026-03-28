@@ -18,8 +18,8 @@ const connectDB = async () => {
     return true;
   } catch (error) {
     databaseConnected = false;
-    console.warn(`MongoDB connection failed: ${error.message}`);
-    console.warn("Search history features will be disabled, but the server will continue starting.");
+    console.error(`MongoDB connection failed: ${error.message}`);
+    console.error("Search history features will be disabled, but the server will continue starting.");
     return false;
   }
 };
