@@ -152,6 +152,7 @@ Before deploying, make sure your MongoDB Atlas cluster allows connections from y
 1. Log in to [MongoDB Atlas](https://cloud.mongodb.com)
 2. Go to **Network Access** → **Add IP Address**
 3. For Render (or any cloud host with dynamic IPs), add `0.0.0.0/0` to allow all IPs
+   > ⚠️ **Security note:** Allowing all IPs is convenient for dynamic-IP hosts like Render, but ensure you use a strong MongoDB username and password. For production workloads, consider [VPC Peering](https://www.mongodb.com/docs/atlas/security-vpc-peering/) or [Private Endpoints](https://www.mongodb.com/docs/atlas/security-private-endpoint/) as a more secure alternative.
 4. Click **Confirm**
 
 > Without this step, the backend will log `MongoDB connection failed` and search history will not work.

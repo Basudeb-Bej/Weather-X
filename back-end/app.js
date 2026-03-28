@@ -33,7 +33,7 @@ app.get("/", (req, res) => {
 app.get("/api/health", (req, res) => {
   const dbConnected = isDatabaseConnected();
   res.status(dbConnected ? 200 : 503).json({
-    success: true,
+    success: dbConnected,
     status: "ok",
     database: dbConnected ? "connected" : "disconnected",
   });
