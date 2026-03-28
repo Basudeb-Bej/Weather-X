@@ -8,7 +8,13 @@ const PORT = process.env.PORT || 8000;
 
 async function startServer() {
   try {
-    await connectDB();
+    const dbConnected = await connectDB();
+    if (!dbConnected) {
+      console.error(
+        "Server starting WITHOUT database connectivity. " +
+        "Search history endpoints will return 503 until MongoDB is configured."
+      );
+    }
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });

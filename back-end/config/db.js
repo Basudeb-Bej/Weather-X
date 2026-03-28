@@ -7,7 +7,11 @@ const connectDB = async () => {
 
   if (!uri) {
     databaseConnected = false;
-    console.warn("MONGODB_URI is not defined. Search history features will be disabled.");
+    console.error(
+      "MONGODB_URI is not defined in back-end/.env. " +
+      "Search history will be unavailable. " +
+      "Set MONGODB_URI=<your-connection-string> to enable persistence."
+    );
     return false;
   }
 
@@ -18,8 +22,11 @@ const connectDB = async () => {
     return true;
   } catch (error) {
     databaseConnected = false;
-    console.warn(`MongoDB connection failed: ${error.message}`);
-    console.warn("Search history features will be disabled, but the server will continue starting.");
+    console.error(`MongoDB connection failed: ${error.message}`);
+    console.error(
+      "Search history will be unavailable. " +
+      "Verify your MONGODB_URI, Atlas credentials, and network access settings."
+    );
     return false;
   }
 };
