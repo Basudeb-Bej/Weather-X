@@ -115,13 +115,15 @@ cd back-end
 npm install
 ```
 
-Create a `.env` file inside `/server`:
+Create a `.env` file inside `back-end/` (copy from `.env.example`):
 
 ```
 PORT=8000
-API_KEY=your_openweather_api_key
-MONGO_URI=your_mongodb_connection_string
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>?retryWrites=true&w=majority
+OPENWEATHER_API_KEY=your_openweather_api_key
 ```
+
+> **Note:** Never commit your `.env` file. It is listed in `.gitignore`.
 
 Run backend server:
 
@@ -136,8 +138,73 @@ npm start
 ```bash
 cd front-end
 npm install
-npm start
+npm run dev
 ```
+
+---
+
+## 🚀 Production Deployment (Render + Vercel + MongoDB Atlas)
+
+### MongoDB Atlas – Network Access
+
+Before deploying, make sure your MongoDB Atlas cluster allows connections from your hosting provider:
+
+1. Log in to [MongoDB Atlas](https://cloud.mongodb.com)
+2. Go to **Network Access** → **Add IP Address**
+3. For Render (or any cloud host with dynamic IPs), add `0.0.0.0/0` to allow all IPs
+   > ⚠️ **Security note:** Allowing all IPs is convenient for dynamic-IP hosts like Render, but ensure you use a strong MongoDB username and password. For production workloads, consider [VPC Peering](https://www.mongodb.com/docs/atlas/security-vpc-peering/) or [Private Endpoints](https://www.mongodb.com/docs/atlas/security-private-endpoint/) as a more secure alternative.
+4. Click **Confirm**
+
+> Without this step, the backend will log `MongoDB connection failed` and search history will not work.
+
+---
+
+### Render (Backend)
+
+Set the following **Environment Variables** in your Render service:
+
+| Variable | Value |
+|---|---|
+| `MONGODB_URI` | `mongodb+srv://user:pass@cluster.mongodb.net/dbname?retryWrites=true&w=majority` |
+| `OPENWEATHER_API_KEY` | Your OpenWeatherMap API key |
+| `PORT` | `8000` |
+
+- **Root Directory:** `back-end`
+- **Build Command:** `npm install`
+- **Start Command:** `npm start`
+
+After setting variables, redeploy the service. You should see `MongoDB Connected: ...` in the logs.
+
+---
+
+### Vercel (Frontend)
+
+Set the following **Environment Variable** in your Vercel project:
+
+| Variable | Value |
+|---|---|
+| `VITE_API_BASE_URL` | `https://your-render-backend-url.onrender.com` |
+
+- **Root Directory:** `front-end`
+- **Build Command:** `npm run build`
+- **Output Directory:** `dist`
+
+Redeploy after setting the environment variable.
+
+---
+
+### Diagnosing Connection Issues
+
+Visit `https://your-render-backend-url.onrender.com/api/health` to check the live DB status:
+
+```json
+{ "success": true, "status": "ok", "database": "connected" }
+```
+
+If `"database": "disconnected"`, check:
+1. `MONGODB_URI` is set correctly in Render
+2. MongoDB Atlas Network Access allows `0.0.0.0/0`
+3. The username and password in the URI are correct (URL-encode special characters)
 
 ---
 

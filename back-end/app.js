@@ -7,6 +7,7 @@ const { notFound } = require("./middleware/notFound");
 const { errorHandler } = require("./middleware/errorHandler");
 const weatherRoutes = require("./routes/weatherRoutes");
 const historyRoutes = require("./routes/historyRoutes");
+const { isDatabaseConnected } = require("./config/db");
 
 const app = express();
 
@@ -26,6 +27,15 @@ app.get("/", (req, res) => {
   res.json({
     success: true,
     message: "Weather API is running",
+  });
+});
+
+app.get("/api/health", (req, res) => {
+  const dbConnected = isDatabaseConnected();
+  res.status(dbConnected ? 200 : 503).json({
+    success: dbConnected,
+    status: dbConnected ? "ok" : "degraded",
+    database: dbConnected ? "connected" : "disconnected",
   });
 });
 
