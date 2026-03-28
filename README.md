@@ -3,7 +3,7 @@
 A modern, production-ready weather application built using the MERN stack.  
 It provides real-time weather data, location-based forecasts, and a clean, responsive UI inspired by real-world applications.
 
-🔗 **Live Demo:** https://weather-x-three.vercel.app/
+🔗 **Live Demo:** https://weather-x-flame.vercel.app
 
 ---
 
