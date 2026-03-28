@@ -8,7 +8,10 @@ const PORT = process.env.PORT || 8000;
 
 async function startServer() {
   try {
-    await connectDB();
+    const dbConnected = await connectDB();
+    if (!dbConnected) {
+      console.warn("Search history storage is unavailable. Set MONGODB_URI in back-end/.env to enable it.");
+    }
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });
