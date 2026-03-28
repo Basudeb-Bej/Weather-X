@@ -6,10 +6,15 @@ const { isDatabaseConnected } = require("../config/db");
 
 async function saveSearch(city) {
   if (!isDatabaseConnected()) {
+    console.warn(`Search history not saved for "${city}": MongoDB is not connected.`);
     return;
   }
 
-  await SearchHistory.create({ city });
+  try {
+    await SearchHistory.create({ city });
+  } catch (error) {
+    console.error(`Failed to save search history for "${city}": ${error.message}`);
+  }
 }
 
 const getCurrentWeather = asyncHandler(async (req, res) => {

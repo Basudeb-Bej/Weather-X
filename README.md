@@ -115,12 +115,12 @@ cd back-end
 npm install
 ```
 
-Create a `.env` file inside `/server`:
+Create a `.env` file inside `back-end/`:
 
 ```
 PORT=8000
 API_KEY=your_openweather_api_key
-MONGO_URI=your_mongodb_connection_string
+MONGODB_URI=your_mongodb_connection_string
 ```
 
 Run backend server:
