@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ?? "";
+const apiBaseUrl =
+  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ??
+  (import.meta.env.DEV ? "http://localhost:8000" : "");
 
 function getApiUrl(path) {
   if (apiBaseUrl) {
@@ -139,15 +141,26 @@ export async function getForecast(latitude, longitude) {
   return data;
 }
 
-export async function saveSearchHistory(city) {
-  const normalizedCity = city?.trim();
+export async function saveSearchHistory(search) {
+  const payload =
+    typeof search === "string"
+      ? { searchQuery: search }
+      : {
+          searchQuery: search?.searchQuery,
+          searchType: search?.searchType,
+          resolvedName: search?.resolvedName,
+          weather: search?.weather,
+        };
 
-  if (!normalizedCity) {
+  const normalizedQuery = payload.searchQuery?.trim();
+
+  if (!normalizedQuery) {
     return null;
   }
 
   const { data } = await axios.post(getApiUrl("/api/history"), {
-    city: normalizedCity,
+    ...payload,
+    searchQuery: normalizedQuery,
   });
 
   return data;

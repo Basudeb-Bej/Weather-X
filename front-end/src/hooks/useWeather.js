@@ -49,7 +49,7 @@ function getGeolocationPosition() {
 export function useWeather() {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const loadWeather = useCallback(async (location, labelFallback) => {
+  const loadWeather = useCallback(async (location, labelFallback, historyMeta = {}) => {
     dispatch({ type: "loading" });
 
     try {
@@ -64,7 +64,20 @@ export function useWeather() {
       });
 
       dispatch({ type: "success", payload: weather });
-      void saveSearchHistory(weather.location.name).catch(() => null);
+      void saveSearchHistory({
+        searchQuery: historyMeta.searchQuery ?? weather.location.name,
+        searchType: historyMeta.searchType ?? (location.name ? "city" : "location"),
+        resolvedName: weather.location.name,
+        weather: {
+          condition: weather.current.conditionLabel,
+          code: weather.current.weatherCode,
+          temperature: weather.current.temperature,
+          feelsLike: weather.current.feelsLike,
+          humidity: weather.current.humidity,
+          windSpeed: weather.current.windSpeed,
+          precipitation: weather.current.precipitation,
+        },
+      }).catch(() => null);
     } catch (error) {
       dispatch({
         type: "error",
@@ -84,7 +97,10 @@ export function useWeather() {
       };
 
       dispatch({ type: "location-status", payload: "loading" });
-      await loadWeather(location, "Your area");
+      await loadWeather(location, "Your area", {
+        searchQuery: "Your area",
+        searchType: "location",
+      });
       dispatch({ type: "location-status", payload: "granted" });
     } catch (error) {
       dispatch({ type: "location-status", payload: "denied" });
@@ -134,7 +150,20 @@ export function useWeather() {
               : null,
         },
       });
-      void saveSearchHistory(weather.location.name ?? matchedQuery ?? query).catch(() => null);
+      void saveSearchHistory({
+        searchQuery: weather.location.name ?? matchedQuery ?? query,
+        searchType: "city",
+        resolvedName: weather.location.name,
+        weather: {
+          condition: weather.current.conditionLabel,
+          code: weather.current.weatherCode,
+          temperature: weather.current.temperature,
+          feelsLike: weather.current.feelsLike,
+          humidity: weather.current.humidity,
+          windSpeed: weather.current.windSpeed,
+          precipitation: weather.current.precipitation,
+        },
+      }).catch(() => null);
       dispatch({ type: "location-status", payload: "manual" });
     } catch (error) {
       dispatch({
@@ -145,7 +174,10 @@ export function useWeather() {
   }, [loadWeather]);
 
   const searchLocation = useCallback(async (location, labelFallback) => {
-    await loadWeather(location, labelFallback ?? location.name);
+    await loadWeather(location, labelFallback ?? location.name, {
+      searchQuery: labelFallback ?? location.name ?? "Selected location",
+      searchType: "location",
+    });
     dispatch({ type: "location-status", payload: "manual" });
   }, [loadWeather]);
 

@@ -3,13 +3,42 @@ const { buildWeatherResponse } = require("../utils/weatherFormatter");
 const { getWeatherByCity, getWeatherByCoordinates } = require("../utils/weatherService");
 const SearchHistory = require("../models/SearchHistory");
 const { isDatabaseConnected } = require("../config/db");
+const { getDisplayClientIp } = require("../utils/requestMeta");
+const { saveHistory } = require("../utils/historyStore");
 
-async function saveSearch(city) {
+async function saveSearch(payload) {
+  const historyPayload = {
+    searchedBy: {
+      ipAddress: payload.ipAddress ?? null,
+      userAgent: payload.userAgent ?? null,
+      userId: payload.userId ?? null,
+    },
+    searchedFor: {
+      query: payload.searchQuery,
+      type: payload.searchType ?? "city",
+      resolvedName: payload.resolvedName ?? payload.searchQuery,
+    },
+    weather: {
+      condition: payload.weather?.condition ?? null,
+      code: payload.weather?.code ?? null,
+      temperature: payload.weather?.temperature ?? null,
+      feelsLike: payload.weather?.feelsLike ?? null,
+      humidity: payload.weather?.humidity ?? null,
+      windSpeed: payload.weather?.windSpeed ?? null,
+      precipitation: payload.weather?.precipitation ?? null,
+    },
+  };
+
   if (!isDatabaseConnected()) {
+    saveHistory(historyPayload);
     return;
   }
 
-  await SearchHistory.create({ city });
+  try {
+    await SearchHistory.create(historyPayload);
+  } catch (error) {
+    saveHistory(historyPayload);
+  }
 }
 
 const getCurrentWeather = asyncHandler(async (req, res) => {
@@ -17,7 +46,22 @@ const getCurrentWeather = asyncHandler(async (req, res) => {
   const payload = await getWeatherByCity(city);
   const formatted = buildWeatherResponse(payload);
 
-  await saveSearch(formatted.location.city);
+  await saveSearch({
+    searchQuery: formatted.location.city,
+    searchType: "city",
+    resolvedName: formatted.location.city,
+    weather: {
+      condition: formatted.current.conditionLabel,
+      code: formatted.current.weatherCode,
+      temperature: formatted.current.temperature,
+      feelsLike: formatted.current.feelsLike,
+      humidity: formatted.current.humidity,
+      windSpeed: formatted.current.windSpeed,
+      precipitation: formatted.current.precipitation,
+    },
+    ipAddress: getDisplayClientIp(req),
+    userAgent: req.get("user-agent"),
+  });
 
   res.json({
     success: true,
@@ -35,7 +79,22 @@ const getForecastWeather = asyncHandler(async (req, res) => {
   const payload = await getWeatherByCity(city);
   const formatted = buildWeatherResponse(payload);
 
-  await saveSearch(formatted.location.city);
+  await saveSearch({
+    searchQuery: formatted.location.city,
+    searchType: "city",
+    resolvedName: formatted.location.city,
+    weather: {
+      condition: formatted.current.conditionLabel,
+      code: formatted.current.weatherCode,
+      temperature: formatted.current.temperature,
+      feelsLike: formatted.current.feelsLike,
+      humidity: formatted.current.humidity,
+      windSpeed: formatted.current.windSpeed,
+      precipitation: formatted.current.precipitation,
+    },
+    ipAddress: getDisplayClientIp(req),
+    userAgent: req.get("user-agent"),
+  });
 
   res.json({
     success: true,
@@ -56,7 +115,22 @@ const getLocationWeather = asyncHandler(async (req, res) => {
   const payload = await getWeatherByCoordinates(latitude, longitude);
   const formatted = buildWeatherResponse(payload);
 
-  await saveSearch(formatted.location.city);
+  await saveSearch({
+    searchQuery: formatted.location.city,
+    searchType: "location",
+    resolvedName: formatted.location.city,
+    weather: {
+      condition: formatted.current.conditionLabel,
+      code: formatted.current.weatherCode,
+      temperature: formatted.current.temperature,
+      feelsLike: formatted.current.feelsLike,
+      humidity: formatted.current.humidity,
+      windSpeed: formatted.current.windSpeed,
+      precipitation: formatted.current.precipitation,
+    },
+    ipAddress: getDisplayClientIp(req),
+    userAgent: req.get("user-agent"),
+  });
 
   res.json({
     success: true,
