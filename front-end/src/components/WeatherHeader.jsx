@@ -106,13 +106,14 @@ function getHeroCopy(weather, theme) {
     subtitle: `Updated ${new Date(current.time).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`,
     condition: current.conditionLabel,
     highlight: isRainy
-      ? "Rain-ready forecast with live wind and precipitation details"
+      ? "Rain-ready forecast with live wind details"
       : `Feels like ${formatTemperature(current.feelsLike)} with ${current.conditionLabel.toLowerCase()}`,
     stats: [
       { label: "Temperature", value: formatTemperature(current.temperature) },
       { label: "Feels like", value: formatTemperature(current.feelsLike) },
       { label: "Humidity", value: formatPercent(current.humidity) },
       { label: "Wind", value: formatWind(current.windSpeed) },
+      { label: "Precipitation", value: `${current.precipitation ?? 0} mm` },
     ],
   };
 }
@@ -159,11 +160,11 @@ export function WeatherHeader({ weather, subtitle, condition, theme, portfolioUr
           </div>
 
           {weather ? (
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-5">
               {hero.stats.map((item) => (
-                <div key={item.label} className="rounded-2xl border border-white/10 bg-slate-950/30 px-4 py-3 backdrop-blur-sm">
-                  <p className="text-[11px] uppercase tracking-[0.28em] text-slate-400">{item.label}</p>
-                  <p className="mt-2 text-lg font-semibold text-white">{item.value}</p>
+                <div key={item.label} className="rounded-xl border border-white/10 bg-slate-950/30 px-3 py-2.5 backdrop-blur-sm">
+                  <p className="text-[10px] uppercase tracking-[0.24em] text-slate-400">{item.label}</p>
+                  <p className="mt-1.5 text-base font-semibold text-white sm:text-lg">{item.value}</p>
                 </div>
               ))}
             </div>

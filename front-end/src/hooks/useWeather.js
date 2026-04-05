@@ -41,7 +41,7 @@ function getGeolocationPosition() {
     navigator.geolocation.getCurrentPosition(resolve, reject, {
       enableHighAccuracy: true,
       timeout: 10000,
-      maximumAge: 300000,
+      maximumAge: 0,
     });
   });
 }
@@ -54,9 +54,15 @@ export function useWeather() {
 
     try {
       const forecast = await getForecast(location.latitude, location.longitude);
-      const resolvedLocation = location.name
-        ? location
-        : (await reverseGeocode(location.latitude, location.longitude)) ?? location;
+      let resolvedLocation = location;
+
+      if (!location.name) {
+        try {
+          resolvedLocation = (await reverseGeocode(location.latitude, location.longitude)) ?? location;
+        } catch {
+          resolvedLocation = location;
+        }
+      }
 
       const weather = buildWeatherModel(forecast, {
         ...resolvedLocation,
@@ -97,8 +103,8 @@ export function useWeather() {
       };
 
       dispatch({ type: "location-status", payload: "loading" });
-      await loadWeather(location, "Your area", {
-        searchQuery: "Your area",
+      await loadWeather(location, "Nearest city", {
+        searchQuery: "Nearest city",
         searchType: "location",
       });
       dispatch({ type: "location-status", payload: "granted" });
@@ -128,9 +134,15 @@ export function useWeather() {
       const [match] = results;
       const weather = await (async () => {
         const forecast = await getForecast(match.latitude, match.longitude);
-        const resolvedLocation = match.name
-          ? match
-          : (await reverseGeocode(match.latitude, match.longitude)) ?? match;
+        let resolvedLocation = match;
+
+        if (!match.name) {
+          try {
+            resolvedLocation = (await reverseGeocode(match.latitude, match.longitude)) ?? match;
+          } catch {
+            resolvedLocation = match;
+          }
+        }
 
         const built = buildWeatherModel(forecast, {
           ...resolvedLocation,

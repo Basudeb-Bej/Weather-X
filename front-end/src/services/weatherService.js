@@ -121,16 +121,42 @@ export async function searchCities(query) {
 }
 
 export async function reverseGeocode(latitude, longitude) {
-  const { data } = await geocodingClient.get("/reverse", {
+  const { data } = await axios.get("https://nominatim.openstreetmap.org/reverse", {
     params: {
-      latitude,
-      longitude,
-      language: "en",
-      format: "json",
+      format: "jsonv2",
+      lat: latitude,
+      lon: longitude,
+      zoom: 10,
+      addressdetails: 1,
     },
+    headers: {
+      Accept: "application/json",
+    },
+    timeout: 12000,
   });
 
-  return data?.results?.[0] ?? null;
+  const address = data?.address ?? {};
+  const cityName =
+    address.city ??
+    address.town ??
+    address.village ??
+    address.municipality ??
+    address.suburb ??
+    address.county ??
+    address.state_district ??
+    null;
+
+  if (!cityName && !data?.display_name) {
+    return null;
+  }
+
+  return {
+    name: cityName ?? data.display_name,
+    admin1: address.state ?? address.state_district ?? address.county ?? null,
+    country: address.country ?? null,
+    latitude: Number(data?.lat ?? latitude),
+    longitude: Number(data?.lon ?? longitude),
+  };
 }
 
 export async function getForecast(latitude, longitude) {

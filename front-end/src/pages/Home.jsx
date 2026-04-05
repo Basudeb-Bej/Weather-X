@@ -5,7 +5,6 @@ import { ForecastList } from "../components/ForecastList";
 import { SearchBar } from "../components/SearchBar";
 import { WeatherChart } from "../components/WeatherChart";
 import { WeatherHeader } from "../components/WeatherHeader";
-import { WeatherStats } from "../components/WeatherStats";
 import { LoadingState } from "../components/LoadingState";
 import { ErrorState } from "../components/ErrorState";
 
@@ -29,7 +28,7 @@ function Home() {
 			<div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-4 sm:px-6 lg:px-8 lg:py-8">
 				<WeatherHeader
 					weather={weather}
-					subtitle={weather ? formatDateLabel(weather.current.time) : "Search a city or allow location access"}
+					subtitle={weather ? formatDateLabel(weather.current.time) : "Allow browser location to load your nearest city automatically"}
 					condition={weather?.current?.conditionLabel ?? "Live weather insights"}
 					theme={theme}
 					portfolioUrl="https://basudeb-bej.me/"
@@ -47,6 +46,7 @@ function Home() {
 							selectSuggestion={citySearch.selectSuggestion}
 							onSearch={searchCity}
 							onSearchLocation={searchLocation}
+							onUseLocation={detectLocation}
 							loading={loading}
 							locationStatus={locationStatus}
 							searchHint={searchHint}
@@ -56,10 +56,6 @@ function Home() {
 
 						{!loading && error && !weather ? (
 							<ErrorState message={error} onRetry={detectLocation} />
-						) : null}
-
-						{!loading && weather ? (
-							<WeatherStats current={weather.current} theme={theme} />
 						) : null}
 
 						{!loading && weather ? (

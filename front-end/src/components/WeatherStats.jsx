@@ -5,7 +5,6 @@ const statItems = [
   { key: "feelsLike", label: "Feels like" },
   { key: "humidity", label: "Humidity" },
   { key: "windSpeed", label: "Wind" },
-  { key: "precipitation", label: "Precipitation" },
 ];
 
 function getStatValue(key, current) {
@@ -18,8 +17,6 @@ function getStatValue(key, current) {
       return formatPercent(current.humidity);
     case "windSpeed":
       return formatWind(current.windSpeed);
-    case "precipitation":
-      return `${current.precipitation ?? 0} mm`;
     default:
       return "--";
   }

@@ -160,6 +160,10 @@ export function buildWeatherModel(forecast, location) {
 	const hourlyTemperature = forecast?.hourly?.temperature_2m ?? [];
 	const hourlyWeatherCode = forecast?.hourly?.weather_code ?? [];
 	const hourlyPrecipitationProbability = forecast?.hourly?.precipitation_probability ?? [];
+	const currentTime = forecast?.current?.time;
+	const currentHourIndex = hourlyTimes.reduce((latestIndex, time, index) => {
+		return currentTime && time <= currentTime ? index : latestIndex;
+	}, 0);
 	const dailyTimes = forecast?.daily?.time ?? [];
 	const dailyWeatherCode = forecast?.daily?.weather_code ?? [];
 	const dailyMax = forecast?.daily?.temperature_2m_max ?? [];
@@ -175,16 +179,17 @@ export function buildWeatherModel(forecast, location) {
 			longitude: location?.longitude ?? null,
 		},
 		current: formatCurrentBlock(forecast.current, location, currentWeather),
-		hourly: hourlyTimes.slice(0, 12).map((time, index) => {
-			const hourlyWeather = mapWeatherCode(hourlyWeatherCode[index]);
+		hourly: hourlyTimes.slice(currentHourIndex, currentHourIndex + 12).map((time, index) => {
+			const sourceIndex = currentHourIndex + index;
+			const hourlyWeather = mapWeatherCode(hourlyWeatherCode[sourceIndex]);
 
 			return {
 				time,
-				temperature: hourlyTemperature[index],
-				weatherCode: hourlyWeatherCode[index],
+				temperature: hourlyTemperature[sourceIndex],
+				weatherCode: hourlyWeatherCode[sourceIndex],
 				weatherLabel: hourlyWeather.label,
 				icon: hourlyWeather.icon,
-				precipitationProbability: hourlyPrecipitationProbability[index] ?? null,
+				precipitationProbability: hourlyPrecipitationProbability[sourceIndex] ?? null,
 			};
 		}),
 		forecast: dailyTimes.map((day, index) => {

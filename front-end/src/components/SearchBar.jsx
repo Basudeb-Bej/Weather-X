@@ -8,12 +8,14 @@ export function SearchBar({
   selectSuggestion,
   onSearch,
   onSearchLocation,
+  onUseLocation,
   loading,
   locationStatus,
   searchHint,
 }) {
   const hasSuggestions = isOpen && (loadingSuggestions || suggestions.length > 0);
   const isLocationEnabled = locationStatus === "granted";
+  const isLocating = locationStatus === "requesting" || locationStatus === "loading";
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -110,9 +112,26 @@ export function SearchBar({
             </span>
           ) : null}
           <span className="text-[8px] leading-none sm:text-[9px]">
-            {locationStatus === "granted" ? "Location enabled" : locationStatus === "denied" ? "Location denied" : "Auto location ready"}
+            {locationStatus === "granted"
+              ? "Nearest city loaded"
+              : locationStatus === "denied"
+                ? "Location denied"
+                : isLocating
+                  ? "Finding nearest city"
+                  : "Auto location ready"}
           </span>
         </span>
+
+        {locationStatus !== "granted" ? (
+          <button
+            type="button"
+            onClick={onUseLocation}
+            disabled={loading || isLocating}
+            className="inline-flex items-center gap-2 rounded-full border border-sky-400/25 bg-sky-400/10 px-3 py-1.5 text-[8px] font-medium uppercase tracking-[0.2em] text-sky-100 transition hover:border-sky-300/40 hover:bg-sky-400/15 disabled:cursor-not-allowed disabled:opacity-60 sm:text-[9px]"
+          >
+            {isLocating ? "Locating..." : "Use my location"}
+          </button>
+        ) : null}
       </div>
 
       {searchHint ? (

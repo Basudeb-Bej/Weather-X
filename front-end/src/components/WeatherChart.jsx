@@ -194,9 +194,9 @@ export function WeatherChart({ hourly, theme, conditionLabel }) {
 
               {points.map((point) => {
                 const weather = mapWeatherCode(point.weatherCode);
-                const temperatureLabelY = point.y - 20;
-                const timeLabelY = point.y + 18;
-                const weatherLabelY = point.y + 36;
+                const temperatureLabelY = point.y - 28;
+                const timeLabelY = point.y + 34;
+                const weatherLabelY = point.y + 52;
 
                 return (
                   <g key={`${point.time}-labels`}>
