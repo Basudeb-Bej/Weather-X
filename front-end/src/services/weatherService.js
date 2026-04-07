@@ -22,6 +22,17 @@ const forecastClient = axios.create({
   timeout: 12000,
 });
 
+const forecastCache = new Map();
+const FORECAST_CACHE_TTL = 5 * 60 * 1000;
+
+function normalizeCoordinate(value) {
+  return Number.parseFloat(Number(value).toFixed(4));
+}
+
+function getForecastCacheKey(latitude, longitude) {
+  return `${normalizeCoordinate(latitude)}:${normalizeCoordinate(longitude)}`;
+}
+
 function normalizeQuery(query) {
   return query.replace(/\s+/g, " ").trim();
 }
@@ -160,11 +171,36 @@ export async function reverseGeocode(latitude, longitude) {
 }
 
 export async function getForecast(latitude, longitude) {
-  const { data } = await forecastClient.get("/forecast", {
-    params: buildForecastParams(latitude, longitude),
+  const cacheKey = getForecastCacheKey(latitude, longitude);
+  const cachedEntry = forecastCache.get(cacheKey);
+
+  if (cachedEntry && Date.now() < cachedEntry.expiresAt) {
+    return cachedEntry.promise ?? cachedEntry.value;
+  }
+
+  const requestPromise = forecastClient
+    .get("/forecast", {
+      params: buildForecastParams(latitude, longitude),
+    })
+    .then(({ data }) => {
+      forecastCache.set(cacheKey, {
+        value: data,
+        expiresAt: Date.now() + FORECAST_CACHE_TTL,
+      });
+
+      return data;
+    })
+    .catch((error) => {
+      forecastCache.delete(cacheKey);
+      throw error;
+    });
+
+  forecastCache.set(cacheKey, {
+    promise: requestPromise,
+    expiresAt: Date.now() + FORECAST_CACHE_TTL,
   });
 
-  return data;
+  return requestPromise;
 }
 
 export async function saveSearchHistory(search) {
