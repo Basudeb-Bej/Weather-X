@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useWeather } from "../hooks/useWeather";
 import { useCitySearch } from "../hooks/useCitySearch";
 import { formatDateLabel, getWeatherTheme } from "../utils/weather";
@@ -9,6 +10,7 @@ import { LoadingState } from "../components/LoadingState";
 import { ErrorState } from "../components/ErrorState";
 
 function Home() {
+	const [selectedForecastSelection, setSelectedForecastSelection] = useState(null);
 	const {
 		weather,
 		loading,
@@ -22,6 +24,28 @@ function Home() {
 	const citySearch = useCitySearch();
 
 	const theme = getWeatherTheme(weather?.current?.weatherCode ?? null);
+	const weatherSelectionKey = weather?.metadata?.updatedAt ?? weather?.current?.time ?? null;
+	const forecast = weather?.forecast ?? [];
+	const selectedDay =
+		selectedForecastSelection && selectedForecastSelection.weatherKey === weatherSelectionKey
+			? forecast.find((day) => day.day === selectedForecastSelection.day) ?? null
+			: null;
+	const selectedSummary = selectedDay
+		? {
+			dayLabel: formatDateLabel(selectedDay.day),
+			conditionLabel: selectedDay.weatherLabel,
+			temperature: `${selectedDay.max}° / ${selectedDay.min}°`,
+			precipitation: `${selectedDay.precipitation ?? 0} mm`,
+		}
+		: null;
+
+	const handleForecastSelect = (day) => {
+		setSelectedForecastSelection((currentSelection) =>
+			currentSelection && currentSelection.day === day.day && currentSelection.weatherKey === weatherSelectionKey
+				? null
+				: { day: day.day, weatherKey: weatherSelectionKey },
+		);
+	};
 
 	return (
 		<main className={`min-h-screen ${theme.backgroundClass} text-slate-100`}>
@@ -64,8 +88,31 @@ function Home() {
 					</div>
 
 					<div className="space-y-5">
+						{selectedSummary ? (
+							<div className="glass-panel panel-hover rounded-3xl border border-sky-400/20 bg-slate-950/40 p-5 sm:p-6">
+								<p className="text-xs uppercase tracking-[0.35em] text-slate-400">Selected forecast</p>
+								<h2 className="mt-2 text-xl font-semibold text-white">{selectedSummary.dayLabel}</h2>
+								<p className="mt-2 text-sm text-slate-300">{selectedSummary.conditionLabel}</p>
+								<div className="mt-4 grid gap-3 sm:grid-cols-2">
+									<div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+										<p className="text-[10px] uppercase tracking-[0.24em] text-slate-400">Temperature</p>
+										<p className="mt-1 text-lg font-semibold text-white">{selectedSummary.temperature}</p>
+									</div>
+									<div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+										<p className="text-[10px] uppercase tracking-[0.24em] text-slate-400">Precipitation</p>
+										<p className="mt-1 text-lg font-semibold text-white">{selectedSummary.precipitation}</p>
+									</div>
+								</div>
+							</div>
+						) : null}
+
 						{!loading && weather ? (
-							<ForecastList forecast={weather.forecast} theme={theme} />
+							<ForecastList
+								forecast={forecast}
+								theme={theme}
+								selectedDay={selectedDay?.day ?? null}
+								onSelectDay={handleForecastSelect}
+							/>
 						) : (
 							<div className="glass-panel panel-hover rounded-3xl p-6">
 								<p className="text-sm uppercase tracking-[0.24em] text-slate-400">Forecast</p>

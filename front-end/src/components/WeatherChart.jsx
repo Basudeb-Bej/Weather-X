@@ -66,7 +66,7 @@ export function WeatherChart({ hourly, theme, conditionLabel }) {
   const gradientId = `weather-chart-gradient-${theme.icon}`;
   const fillId = `weather-chart-fill-${theme.icon}`;
   const legendItems = [
-    { label: "Sunny", icon: "sunny", color: "#f59e0b" },
+    { label: "clear", icon: "sunny", color: "#f59e0b" },
     { label: "Rain", icon: "rain", color: "#38bdf8" },
     { label: "Snow", icon: "snow", color: "#e0f2fe" },
     { label: "Storm", icon: "storm", color: "#a78bfa" },

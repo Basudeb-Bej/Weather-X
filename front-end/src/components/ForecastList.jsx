@@ -1,6 +1,6 @@
 import { ForecastCard } from "./ForecastCard";
 
-export function ForecastList({ forecast }) {
+export function ForecastList({ forecast, selectedDay, onSelectDay }) {
   return (
     <section className="glass-panel panel-hover rounded-3xl p-5 sm:p-6">
       <div className="flex items-center justify-between gap-4">
@@ -10,9 +10,9 @@ export function ForecastList({ forecast }) {
         </div>
       </div>
 
-      <div className="mt-5 grid gap-3">
+      <div className="mt-4 grid max-h-[26rem] gap-2 overflow-y-auto pr-1 sm:max-h-[33.5rem]">
         {forecast.map((day) => (
-          <ForecastCard key={day.day} day={day} />
+          <ForecastCard key={day.day} day={day} selected={selectedDay === day.day} onSelect={onSelectDay} />
         ))}
       </div>
     </section>

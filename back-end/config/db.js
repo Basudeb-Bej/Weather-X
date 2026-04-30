@@ -3,8 +3,16 @@ const mongoose = require("mongoose");
 let databaseConnected = false;
 
 const connectDB = async () => {
+  const mongoUri = process.env.MONGODB_URI;
+
+  if (!mongoUri) {
+    databaseConnected = false;
+    console.log("MONGODB_URI is not set. Using in-memory history fallback.");
+    return;
+  }
+
   try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
+    const conn = await mongoose.connect(mongoUri);
     databaseConnected = true;
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
